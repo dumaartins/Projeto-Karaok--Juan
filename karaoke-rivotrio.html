@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Karaoke - Banda Rivotrio</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0a0a;
+    --surface: #141414;
+    --surface2: #1e1e1e;
+    --surface3: #272727;
+    --accent: #e63946;
+    --accent2: #ff6b6b;
+    --gold: #ffd166;
+    --text: #f0f0f0;
+    --text2: #a0a0a0;
+    --border: #2a2a2a;
+    --radius: 10px;
+  }
+
+  html, body { min-height: 100vh; }
+
+  body {
+    background-color: var(--bg);
+    background-image:
+      linear-gradient(rgba(10,10,10,0.93), rgba(10,10,10,0.93)),
+      url('logo.png');
+    background-repeat: no-repeat;
+    background-position: center top;
+    background-size: min(480px, 70vw) auto, cover;
+    background-attachment: fixed;
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+  }
+
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 20px 16px;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+
+  header h1 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 14px;
+  }
+
+  .style-tabs {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .style-tab {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    padding: 7px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .style-tab:hover { border-color: var(--accent); color: var(--text); }
+  .style-tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  .style-tab.gold-tab {
+    background: rgba(255,209,102,0.12);
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+
+  .style-tab.gold-tab.active { background: var(--gold); color: #0a0a0a; }
+
+  main { max-width: 680px; margin: 0 auto; padding: 20px 16px 40px; }
+
+  .most-requested {
+    background: linear-gradient(135deg, #1a1200, #1e1600);
+    border: 1px solid var(--gold);
+    border-radius: var(--radius);
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+
+  .most-requested-header {
+    background: rgba(255,209,102,0.1);
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid rgba(255,209,102,0.2);
+  }
+
+  .star-icon { font-size: 22px; }
+
+  .most-requested-header h2 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--gold);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+
+  .most-requested-header span {
+    font-size: 12px;
+    color: rgba(255,209,102,0.6);
+    margin-left: auto;
+  }
+
+  .most-songs { padding: 12px 18px 16px; display: flex; flex-direction: column; gap: 2px; }
+
+  .most-song-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 9px 10px;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .most-song-item:hover { background: rgba(255,209,102,0.08); }
+
+  .rank { font-size: 11px; font-weight: 700; color: rgba(255,209,102,0.4); min-width: 20px; text-align: right; }
+
+  .most-song-info { flex: 1; }
+  .most-song-name { font-size: 14px; font-weight: 500; color: var(--text); }
+  .most-song-band { font-size: 12px; color: var(--gold); opacity: 0.7; margin-top: 1px; }
+
+  .add-btn-gold {
+    background: rgba(255,209,102,0.12);
+    border: 1px solid rgba(255,209,102,0.3);
+    color: var(--gold);
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .add-btn-gold:hover { background: rgba(255,209,102,0.22); }
+
+  .section-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text2);
+    padding: 0 0 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  .band-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 12px; overflow: hidden; }
+
+  .band-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: background 0.15s;
+    user-select: none;
+  }
+
+  .band-header:hover { background: var(--surface2); }
+
+  .band-icon {
+    width: 36px; height: 36px; border-radius: 8px;
+    background: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; flex-shrink: 0;
+  }
+
+  .band-name { flex: 1; font-size: 15px; font-weight: 600; color: var(--text); }
+
+  .band-count {
+    font-size: 12px; color: var(--text2);
+    background: var(--surface2); border: 1px solid var(--border);
+    padding: 3px 8px; border-radius: 10px;
+  }
+
+  .chevron { font-size: 12px; color: var(--text2); margin-left: 8px; transition: transform 0.2s; }
+  .chevron.open { transform: rotate(180deg); }
+
+  .songs-list { display: none; border-top: 1px solid var(--border); }
+  .songs-list.open { display: block; }
+
+  .song-item {
+    display: flex; align-items: center;
+    padding: 10px 16px 10px 64px;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s; gap: 10px;
+  }
+
+  .song-item:last-child { border-bottom: none; }
+  .song-item:hover { background: var(--surface2); }
+  .song-name { flex: 1; font-size: 14px; color: var(--text); }
+
+  .add-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text2);
+    padding: 5px 12px; border-radius: 6px;
+    font-size: 12px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s; white-space: nowrap;
+  }
+
+  .add-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(230,57,70,0.08); }
+  .add-btn.added { border-color: #2ecc71; color: #2ecc71; background: rgba(46,204,113,0.08); }
+
+  .queue-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--surface); border-top: 1px solid var(--border);
+    padding: 12px 20px;
+    display: flex; align-items: center; gap: 14px;
+    z-index: 200;
+    transform: translateY(100%); transition: transform 0.3s;
+  }
+
+  .queue-bar.visible { transform: translateY(0); }
+
+  .queue-info { flex: 1; }
+  .queue-count { font-size: 13px; font-weight: 700; color: var(--accent); }
+  .queue-names { font-size: 11px; color: var(--text2); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 200px; }
+
+  .queue-clear { background: transparent; border: 1px solid var(--border); color: var(--text2); padding: 8px 14px; border-radius: 7px; font-size: 13px; cursor: pointer; }
+  .queue-send { background: var(--accent); border: none; color: #fff; padding: 8px 18px; border-radius: 7px; font-size: 13px; font-weight: 700; cursor: pointer; }
+
+  .toast {
+    position: fixed; top: 90px; left: 50%;
+    transform: translateX(-50%) translateY(-20px);
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text); padding: 10px 20px; border-radius: 8px;
+    font-size: 13px; font-weight: 500;
+    opacity: 0; transition: all 0.3s;
+    pointer-events: none; white-space: nowrap; z-index: 300;
+  }
+
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  .admin-section { margin-top: 30px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .admin-header { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; cursor: pointer; }
+  .admin-icon { font-size: 18px; }
+  .admin-title { font-size: 14px; font-weight: 600; color: var(--text2); }
+  .admin-body { padding: 18px; display: none; }
+  .admin-body.open { display: block; }
+
+  .password-gate { display: flex; gap: 10px; margin-bottom: 16px; }
+  .password-gate input { flex: 1; background: var(--surface2); border: 1px solid var(--border); border-radius: 7px; color: var(--text); padding: 9px 14px; font-size: 14px; outline: none; }
+  .password-gate input:focus { border-color: var(--accent); }
+  .password-gate button { background: var(--accent); border: none; color: #fff; padding: 9px 18px; border-radius: 7px; font-size: 13px; font-weight: 700; cursor: pointer; }
+
+  .add-form { display: none; }
+  .add-form.open { display: block; }
+
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+  .form-row select, .form-row input { background: var(--surface2); border: 1px solid var(--border); border-radius: 7px; color: var(--text); padding: 9px 14px; font-size: 14px; outline: none; width: 100%; }
+  .form-row select:focus, .form-row input:focus { border-color: var(--accent); }
+  .form-row select option { background: var(--surface2); }
+
+  .form-submit { background: var(--accent); border: none; color: #fff; padding: 10px 20px; border-radius: 7px; font-size: 14px; font-weight: 700; cursor: pointer; width: 100%; margin-top: 4px; }
+
+  .admin-msg { font-size: 13px; color: #2ecc71; margin-top: 10px; display: none; }
+
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+    z-index: 400; display: none; align-items: center; justify-content: center; padding: 20px;
+  }
+  .modal-overlay.open { display: flex; }
+
+  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 24px; max-width: 400px; width: 100%; }
+  .modal h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; color: var(--text); }
+  .modal p { font-size: 13px; color: var(--text2); margin-bottom: 18px; line-height: 1.5; }
+
+  .modal-list { max-height: 180px; overflow-y: auto; margin-bottom: 18px; }
+  .modal-song { display: flex; align-items: center; gap: 8px; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .modal-song:last-child { border-bottom: none; }
+  .modal-song-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+
+  .name-input-wrap { margin-bottom: 16px; }
+  .name-input-wrap label { font-size: 12px; color: var(--text2); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; display: block; margin-bottom: 6px; }
+  .name-input-wrap input {
+    width: 100%; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; color: var(--text); padding: 10px 14px;
+    font-size: 14px; outline: none;
+  }
+  .name-input-wrap input:focus { border-color: var(--accent); }
+
+  .modal-actions { display: flex; gap: 10px; }
+  .modal-cancel { flex: 1; background: transparent; border: 1px solid var(--border); color: var(--text2); padding: 10px; border-radius: 8px; font-size: 14px; cursor: pointer; }
+  .modal-confirm { flex: 2; background: #25d366; border: none; color: #fff; padding: 10px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+  .modal-confirm:hover { background: #1ebe5d; }
+
+  .welcome-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.88);
+    z-index: 500; display: flex; align-items: center; justify-content: center; padding: 20px;
+  }
+  .welcome-overlay.closed { display: none; }
+
+  .welcome-balloon {
+    position: relative;
+    background: linear-gradient(160deg, var(--surface2), var(--surface));
+    border: 1px solid var(--accent); border-radius: 18px;
+    padding: 30px 26px 26px; max-width: 420px; width: 100%;
+    box-shadow: 0 10px 40px rgba(230,57,70,0.25);
+    animation: pop-in 0.25s ease-out;
+  }
+
+  @keyframes pop-in { from { transform: scale(0.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+  .welcome-close {
+    position: absolute; top: 12px; right: 12px;
+    width: 30px; height: 30px; border-radius: 50%;
+    background: var(--surface3); border: 1px solid var(--border);
+    color: var(--text2); font-size: 16px; line-height: 1; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+  }
+
+  .welcome-close:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  .welcome-title { font-size: 18px; font-weight: 800; letter-spacing: 1px; color: var(--gold); text-align: center; margin-bottom: 16px; padding-right: 20px; }
+
+  .welcome-balloon ul.bullets { list-style: none; margin-bottom: 16px; }
+  .welcome-balloon ul.bullets li { font-size: 14px; color: var(--text); padding: 4px 0 4px 22px; position: relative; }
+  .welcome-balloon ul.bullets li::before { content: '🎤'; position: absolute; left: 0; top: 3px; font-size: 13px; }
+  .welcome-balloon ul.bullets li.dash::before { content: '✨'; }
+
+  .welcome-subtitle { font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--accent2); margin: 18px 0 10px; text-align: center; }
+
+  .welcome-steps { list-style: none; counter-reset: step; }
+  .welcome-steps li { counter-increment: step; font-size: 14px; color: var(--text); padding: 6px 0 6px 32px; position: relative; }
+  .welcome-steps li::before { content: counter(step); position: absolute; left: 0; top: 4px; width: 20px; height: 20px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+
+  .welcome-cta { margin-top: 22px; width: 100%; background: var(--accent); border: none; color: #fff; padding: 12px; border-radius: 9px; font-size: 14px; font-weight: 700; cursor: pointer; }
+
+  @media (max-width: 480px) {
+    header h1 { font-size: 18px; }
+    .style-tab { font-size: 12px; padding: 6px 12px; }
+    .song-item { padding-left: 50px; }
+    .form-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="welcome-overlay" id="welcomeOverlay">
+  <div class="welcome-balloon">
+    <button class="welcome-close" onclick="closeWelcome()" aria-label="Fechar">✕</button>
+    <div class="welcome-title">CATÁLOGO KARAOKÊ<br>DO RIVO TRIO</div>
+    <ul class="bullets">
+      <li>Escolha sua música.</li>
+      <li>Suba ao palco.</li>
+      <li class="dash">Seja o vocalista da banda por uma noite.</li>
+    </ul>
+    <div class="welcome-subtitle">Como Funciona</div>
+    <ol class="welcome-steps">
+      <li>Escolha uma música do catálogo.</li>
+      <li>Clique em enviar, e informe seu nome.</li>
+      <li>Aguarde sua vez.</li>
+      <li>Cante acompanhado por banda ao vivo.</li>
+    </ol>
+    <button class="welcome-cta" onclick="closeWelcome()">Ver catálogo 🎶</button>
+  </div>
+</div>
+
+<header>
+  <div class="logo">🎤 Karaokê</div>
+  <h1>Escolha sua música</h1>
+  <div class="style-tabs" id="styleTabs">
+    <button class="style-tab gold-tab active" data-style="mais-pedidas">⭐ Mais Pedidas</button>
+    <button class="style-tab" data-style="rock-br">🇧🇷 Rock Nacional</button>
+    <button class="style-tab" data-style="emo">🖤 Emo / Punk</button>
+    <button class="style-tab" data-style="reggae">🌿 Reggae</button>
+    <button class="style-tab" data-style="rock-int">🌎 Rock Internacional</button>
+    <button class="style-tab" data-style="mpb">🎵 Pop, MPB & Festas</button>
+    <button class="style-tab" data-style="funk">🔥 Funk & Pop</button>
+  </div>
+</header>
+
+<main id="mainContent"></main>
+
+<div class="queue-bar" id="queueBar">
+  <div class="queue-info">
+    <div class="queue-count" id="queueCount">0 música(s) selecionada(s)</div>
+    <div class="queue-names" id="queueNames"></div>
+  </div>
+  <button class="queue-clear" onclick="clearQueue()">Limpar</button>
+  <button class="queue-send" onclick="openModal()">Enviar 🎶</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h3>🎤 Confirmar pedido</h3>
+    <p>Revise suas músicas e informe seu nome para a banda te chamar no palco!</p>
+    <div class="modal-list" id="modalList"></div>
+    <div class="name-input-wrap">
+      <label for="singerName">Seu nome</label>
+      <input type="text" id="singerName" placeholder="Ex: João, Maria..." maxlength="40" />
+    </div>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeModal()">Voltar</button>
+      <button class="modal-confirm" onclick="confirmQueue()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.533 5.862L0 24l6.343-1.51A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.006-1.368l-.36-.214-3.726.888.929-3.63-.234-.373A9.818 9.818 0 012.182 12C2.182 6.58 6.58 2.182 12 2.182S21.818 6.58 21.818 12 17.42 21.818 12 21.818z"/></svg>
+        Enviar via WhatsApp
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+const WHATSAPP_NUMBER = "5515996294176";
+const ADMIN_PASS = "banda2025";
+
+const data = {
+  "rock-br": {
+    label: "Rock Nacional", icon: "🇧🇷",
+    bands: [
+      { name: "Detonautas", songs: ["Só Por Hoje","Outro Lugar","Quando o Sol Se For","O Amanhã"] },
+      { name: "Charlie Brown Jr", songs: ["Lutar Pelo Que É Meu","Te Levar","Só Por Uma Noite","Papo Reto","Proibida Pra Mim","Tudo Que Ela Gosta de Escutar","Só Os Loucos Sabem","Como Tudo Deve Ser","Samba Makossa","Hoje Eu Acordei Feliz","O Coro Vai Comer","Zoio de Lula","Não Uso Sapato","Lugar Ao Sol","Ela Vai Voltar","O Preço","Vícios e Virtudes","Champagne e Água Benta","Quinta Feira"] },
+      { name: "O Rappa", songs: ["Pescador de Ilusões","A Minha Alma","Vapor Barato","Anjos (Pra Quem Tem Fé)","Hey Joe","Mar de Gente","Lado A Lado B","O Que Sobrou do Céu","Rodo Cotidiano","Me Deixa","Papo de Surdo e Mudo","Ilê Ayê","Meu Santo Tá Cansado","Monstro Invisível","Na Frente do Reto"] },
+      { name: "Skank", songs: ["Uma Partida de Futebol","Resposta","Saideira","Tão Seu","Jack Tequila","Te Ver","Acima do Sol","Vou Deixar","Ainda Gosto Dela","Garota Nacional"] },
+      { name: "Capital Inicial", songs: ["Primeiros Erros","Fátima","À Sua Maneira","Eu Vou Estar","Independência","Quatro Vezes Você","Natasha","Tudo Que Vai","O Passageiro","Não Olhe Pra Trás"] },
+      { name: "Titãs", songs: ["Sonífera Ilha","Pra Dizer Adeus","É Preciso Saber Viver","Marvin","Flores","Homem Primata","Os Cegos do Castelo","Bichos Escrotos"] },
+      { name: "Tihuana", songs: ["Renata","Que Vês"] },
+      { name: "O Surto", songs: ["A Cera","Tudo É Possível"] },
+      { name: "Ultraje a Rigor", songs: ["Nós Vamos Invadir Sua Praia","Ciúme","Inútil","Marylou","Sexo","Nada a Declarar","O Chiclete"] },
+      { name: "Paralamas do Sucesso", songs: ["Meu Erro","Óculos","Vital e Sua Moto","Aonde Quer Que Eu Vá","Lanterna dos Afogados","Uma Brasileira","Caleidoscópio","A Novidade","La Bella Luna"] },
+      { name: "Barão Vermelho", songs: ["Pro Dia Nascer Feliz","Bete Balanço","O Tempo Não Para","Exagerado","Por Você","Puro Êxtase"] },
+      { name: "Raimundos", songs: ["I Saw You Say","Selim","O Pão da Minha Prima","A Mais Pedida","Eu Quero Ver o Oco","Mulher de Fases"] },
+      { name: "Raul Seixas", songs: ["Como Vovó Já Dizia","Metamorfose Ambulante","Maluco Beleza","S.O.S","Cowboy Fora da Lei","Let Me Sing","Meu Amigo Pedro","Gita","Eu Nasci Há 10 Mil Anos Atrás","Al Capone","Capim Guiné","Ouro de Tolo","Tu És o MDC da Minha Vida","Medo da Chuva","Trem das Sete","Sociedade Alternativa","Aluga-Se","Rock das Aranha","As Minas do Rei Salomão"] },
+      { name: "Jota Quest", songs: ["O Sol","Fácil","Só Hoje","Dias Melhores","O Que Eu Também Não Entendo","Mais Uma Vez","Encontrar Alguém","Do Seu Lado","Sempre Assim","Na Moral"] },
+      { name: "Legião Urbana", songs: ["Tempo Perdido","Pais e Filhos","Será","Há Tempos","Eu Sei","Quase Sem Querer","Ainda É Cedo","Que País É Este","Dezesseis","Faroeste Caboclo","Hoje à Noite Não Tem Luar","Eduardo e Mônica","Teorema","1965 (Duas Tribos)"] },
+      { name: "Ira!", songs: ["Eu Quero Sempre Mais","Envelheço na Cidade","Tarde Vazia","Núcleo Base"] },
+      { name: "Planet Hemp", songs: ["Mantenha o Respeito"] },
+      { name: "Engenheiros do Hawaii", songs: ["Eu Que Não Amo Você","Pra Ser Sincero","Infinita Highway","O Papa é Pop","Era um Garoto Que Como Eu","Somos Quem Podemos Ser"] },
+      { name: "Los Hermanos", songs: ["Anna Julia"] },
+      { name: "Mamonas Assassinas", songs: ["Pelados em Santos","Uma Arlinda Mulher","Vira-Vira","Chopi Centis"] },
+      { name: "Plebe Rude", songs: ["Até Quando Esperar"] },
+      { name: "Nenhum de Nós", songs: ["Camila","Sobre o Tempo","Astronauta de Mármore"] },
+      { name: "Biquini Cavadão", songs: ["Tédio","Dani","Janaína"] },
+      { name: "CPM 22", songs: ["Regina Lets Go","Irreversível","Tarde de Outubro","Desconfio","Não Sei Viver Sem Ter Você","Um Minuto Para o Fim do Mundo","O Mundo Dá Voltas","Dias Atrás"] }
+    ]
+  },
+
+  "emo": {
+    label: "Emo / Punk", icon: "🖤",
+    bands: [
+      { name: "Blink-182", songs: ["All The Small Things"] },
+      { name: "Green Day", songs: ["She","Basket Case"] },
+      { name: "Simple Plan", songs: ["I'm Just a Kid"] },
+      { name: "Forfun", songs: ["História de Verão"] },
+      { name: "Carbona", songs: ["Meu Primeiro All Star","Fliperama"] },
+      { name: "Strike", songs: ["Paraíso Proibido"] },
+      { name: "LS Jack", songs: ["Carla"] },
+      { name: "Restart", songs: ["Levo Comigo"] },
+      { name: "Pitty", songs: ["Equalize","Máscara","Na Sua Estante","Teto de Vidro","Admirável Chip Novo"] },
+      { name: "NX Zero", songs: ["Só Rezo","Razões e Emoções","Além de Mim","Cedo ou Tarde"] },
+      { name: "Hateen", songs: ["Quem Já Perdeu Um Sonho Aqui","1997"] },
+      { name: "Fresno", songs: ["Polo","Uma Música","Desde Quando Você Se Foi"] },
+      { name: "Detonautas", songs: ["Só Por Hoje","Outro Lugar","Quando o Sol Se For","O Amanhã"] },
+      { name: "CPM 22", songs: ["Regina Lets Go","Irreversível","Tarde de Outubro","Desconfio","Não Sei Viver Sem Ter Você","Um Minuto Para o Fim do Mundo","O Mundo Dá Voltas","Dias Atrás"] }
+    ]
+  },
+
+  "reggae": {
+    label: "Reggae", icon: "🌿",
+    bands: [
+      { name: "Planta & Raiz", songs: ["O Ragga","Atual Situação","Pra Poucos","Vamos Fugir","Oh Chuva","Tô no Barato","Com Certeza","Aquele Lugar","A Dois Passos do Paraíso","De Você Só Quero Amor"] },
+      { name: "Natiruts", songs: ["Palmares 1999","Deixa o Menino Jogar","Quero Ser Feliz Também","Natiruts Reggae Power","Eu e Ela","Andei Só","Naticongo","Carcará e a Rosa","Beija-Flor","Liberdade Pra Dentro da Cabeça"] },
+      { name: "Bob Marley", songs: ["Stir It Up","Waiting in Vain","Is This Love","War","No More Trouble","Get Up Stand Up","Redemption Song","I Shot the Sheriff","Jamming","Them Belly Full","Kink Reggae"] },
+      { name: "Cidade Negra", songs: ["A Sombra da Maldade","Firmamento","A Estrada","Onde Você Mora"] },
+      { name: "Chimarruts", songs: ["Versos Simples"] },
+      { name: "Maskavo", songs: ["Um Anjo do Céu"] },
+      { name: "Ponto de Equilíbrio", songs: ["Coisa Feia"] },
+      { name: "Armandinho", songs: ["Ursinho de Dormir"] },
+      { name: "Edu Ribeiro", songs: ["Me Namora"] },
+      { name: "Paralamas do Sucesso", songs: ["Uma Brasileira"] }
+    ]
+  },
+
+  "rock-int": {
+    label: "Rock Internacional", icon: "🌎",
+    bands: [
+      { name: "Deep Purple", songs: ["Smoke on the Water"] },
+      { name: "Kings of Leon", songs: ["Sex on Fire"] },
+      { name: "Lenny Kravitz", songs: ["Fly Away"] },
+      { name: "Metallica", songs: ["Nothing Else Matters","Enter Sandman"] },
+      { name: "Sublime", songs: ["Santeria"] },
+      { name: "Iron Maiden", songs: ["Fear of the Dark"] },
+      { name: "Ramones", songs: ["Blitzkrieg Bop","I Wanna Be Sedated","I Wanna Be Your Boyfriend"] },
+      { name: "Guns N' Roses", songs: ["Knocking on Heaven's Door","Sweet Child O' Mine"] },
+      { name: "Red Hot Chili Peppers", songs: ["Californication","Dani California","Scar Tissue","By the Way","Other Side","Parallel Universe","Easily","Under the Bridge","Aeroplane","Around the World","Give It Away","The Zephyr Song","Snow","Dosed","Dark Necessities","Can't Stop","Tell Me Baby","Universally Speaking"] },
+      { name: "The Strokes", songs: ["Last Nite"] },
+      { name: "Queen", songs: ["I Want to Break Free"] },
+      { name: "Faith No More", songs: ["Easy"] },
+      { name: "Creedence", songs: ["Have You Ever Seen the Rain","Fortunate Son","Proud Mary"] },
+      { name: "Steppenwolf", songs: ["Born to Be Wild"] },
+      { name: "The Doors", songs: ["Love Me Two Times","Break on Through","Roadhouse Blues"] },
+      { name: "Audioslave", songs: ["Like a Stone"] },
+      { name: "Pearl Jam", songs: ["Black","Jeremy","Alive","Last Kiss"] },
+      { name: "Rage Against the Machine", songs: ["Killing in the Name"] },
+      { name: "U2", songs: ["With or Without You","New Year's Day"] },
+      { name: "Foo Fighters", songs: ["Learn to Fly"] },
+      { name: "Simple Minds", songs: ["Don't You"] },
+      { name: "Pink Floyd", songs: ["Comfortably Numb","Time","The Wall","Wish You Were Here"] },
+      { name: "Bon Jovi", songs: ["Livin' on a Prayer","It's My Life","Misunderstood","You Give Love a Bad Name"] },
+      { name: "A-ha", songs: ["Take On Me"] },
+      { name: "Talking Heads", songs: ["Psycho Killer"] },
+      { name: "Tears for Fears", songs: ["Everybody Wants to Rule the World"] },
+      { name: "The Offspring", songs: ["The Kids Aren't All Right"] },
+      { name: "4 Non Blondes", songs: ["What's Up"] },
+      { name: "Joan Osborne", songs: ["One of Us"] },
+      { name: "The Cranberries", songs: ["Zombie"] },
+      { name: "System of a Down", songs: ["Lonely Day","Toxicity","Aerials"] },
+      { name: "Stone Temple Pilots", songs: ["Plush"] },
+      { name: "Rolling Stones", songs: ["Satisfaction"] },
+      { name: "Radiohead", songs: ["Creep"] },
+      { name: "Joe Cocker", songs: ["Never Tear Us Apart"] },
+      { name: "Eric Clapton", songs: ["Cocaine"] },
+      { name: "Black Sabbath", songs: ["Paranoid","War Pigs"] },
+      { name: "Alice in Chains", songs: ["Man in the Box"] },
+      { name: "Nirvana", songs: ["Smells Like Teen Spirit","About a Girl","Come as You Are","In Bloom","All Apologies"] },
+      { name: "Nickelback", songs: ["How You Remind Me"] },
+      { name: "Linkin Park", songs: ["Numb","In the End"] },
+      { name: "The Beatles", songs: ["Come Together","Twist and Shout","Hey Jude","Ticket to Ride","Help","Love Me Do","All My Loving","And I Love Her"] },
+      { name: "Creed", songs: ["My Sacrifice"] },
+      { name: "Oasis", songs: ["Wonderwall"] },
+      { name: "AC/DC", songs: ["Highway to Hell","You Shook Me All Night Long","Back in Black","TNT"] },
+      { name: "Blink-182", songs: ["All The Small Things"] },
+      { name: "Green Day", songs: ["She","Basket Case"] },
+      { name: "Simple Plan", songs: ["I'm Just a Kid"] }
+    ]
+  },
+
+  "mpb": {
+    label: "Pop, MPB & Festas", icon: "🎵",
+    bands: [
+      { name: "Sydney Magal", songs: ["Meu Sangue Ferve por Você"] },
+      { name: "Chitãozinho e Xororó", songs: ["Evidências"] },
+      { name: "Ivete Sangalo", songs: ["Eva"] },
+      { name: "Tim Maia", songs: ["Você","Gostava Tanto de Você","Primavera","Descobridor dos 7 Mares","Não Quero Dinheiro","Do Leme ao Pontal","Sossego","W Brasil","Aquele Abraço"] },
+      { name: "Jovem Guarda", songs: ["Diana","Vem Quente Que Eu Estou Fervendo","Como É Grande o Meu Amor por Você"] },
+      { name: "Carlos Santana", songs: ["Oye Como Va"] },
+      { name: "Jorge Ben", songs: ["País Tropical","Fio Maravilha","Taj Mahal"] },
+      { name: "Gilberto Gil", songs: ["Andar com Fé"] },
+      { name: "Roupa Nova", songs: ["Whisky a Gogo"] },
+      { name: "Alceu Valença", songs: ["Anunciação"] },
+      { name: "Dominguinhos", songs: ["Xodó"] },
+      { name: "Zeca Baleiro", songs: ["Ai Que Saudade d'Ocê","Telegrama","Lenha"] },
+      { name: "Djavan", songs: ["Sina","Se","Te Devoro","Nem Um Dia"] },
+      { name: "Lulu Santos", songs: ["Toda Forma de Amor","Apenas Mais Uma de Amor","Tempos Modernos","Assim Caminha a Humanidade"] },
+      { name: "Cássia Eller", songs: ["Segundo Sol","Malandragem","Por Enquanto"] },
+      { name: "Nando Reis", songs: ["Luz dos Olhos","Por Onde Andei","Segundo Sol","All Star"] },
+      { name: "Kid Abelha", songs: ["Como Eu Quero","Na Rua Na Chuva Na Fazenda","Pintura Íntima"] },
+      { name: "Marina Lima", songs: ["Uma Noite e Meia","A Francesa"] },
+      { name: "Rita Lee", songs: ["Ovelha Negra","Mania de Você","Jardins da Babilônia"] },
+      { name: "Vanessa Rangel", songs: ["Palpite"] },
+      { name: "Adriana Calcanhoto", songs: ["Devolva-me"] },
+      { name: "Belchior", songs: ["Sujeito de Sorte"] }
+    ]
+  },
+
+  "funk": {
+    label: "Funk & Pop Atualidades", icon: "🔥",
+    bands: [
+      { name: "Rael da Rima", songs: ["Envolvidão"] },
+      { name: "Gloria Groove", songs: ["A Queda"] },
+      { name: "Marina Sena", songs: ["Por Supuesto"] },
+      { name: "Anitta", songs: ["Bang"] },
+      { name: "Criolo", songs: ["Não Existe Amor em SP"] }
+    ]
+  }
+};
+
+const mostRequested = [
+  { song: "Anna Julia", band: "Los Hermanos" },
+  { song: "Tempo Perdido", band: "Legião Urbana" },
+  { song: "Pais e Filhos", band: "Legião Urbana" },
+  { song: "Primeiros Erros", band: "Capital Inicial" },
+  { song: "Meu Erro", band: "Paralamas do Sucesso" },
+  { song: "Lanterna dos Afogados", band: "Paralamas do Sucesso" },
+  { song: "Mulher de Fases", band: "Raimundos" },
+  { song: "O Sol", band: "Jota Quest" },
+  { song: "Te Levar", band: "Charlie Brown Jr" },
+  { song: "Samba Makossa", band: "Charlie Brown Jr" },
+  { song: "A Minha Alma", band: "O Rappa" },
+  { song: "Quero Ser Feliz Também", band: "Natiruts" },
+  { song: "Andei Só", band: "Natiruts" },
+  { song: "All The Small Things", band: "Blink-182" },
+  { song: "Dias Atrás", band: "CPM 22" },
+  { song: "Black", band: "Pearl Jam" },
+  { song: "Last Kiss", band: "Pearl Jam" },
+  { song: "Wish You Were Here", band: "Pink Floyd" },
+  { song: "Zombie", band: "The Cranberries" },
+  { song: "Creep", band: "Radiohead" },
+  { song: "My Sacrifice", band: "Creed" },
+  { song: "Easy", band: "Faith No More" },
+  { song: "It's My Life", band: "Bon Jovi" },
+  { song: "Mantenha o Respeito", band: "Planet Hemp" },
+  { song: "Não Existe Amor em SP", band: "Criolo" },
+  { song: "Meu Sangue Ferve por Você", band: "Sydney Magal" },
+  { song: "Evidências", band: "Chitãozinho e Xororó" },
+  { song: "Metamorfose Ambulante", band: "Raul Seixas" },
+  { song: "Eduardo e Mônica", band: "Legião Urbana" },
+  { song: "Faroeste Caboclo", band: "Legião Urbana" }
+];
+
+let queue = [];
+let currentStyle = "mais-pedidas";
+
+function closeWelcome() {
+  document.getElementById('welcomeOverlay').classList.add('closed');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+function toggleSong(song, band, btn) {
+  const key = song + '||' + band;
+  const idx = queue.findIndex(q => q.key === key);
+  if (idx >= 0) {
+    queue.splice(idx, 1);
+    btn.textContent = '+ Pedir';
+    btn.classList.remove('added');
+    showToast('Removido da lista');
+  } else {
+    if (queue.length >= 5) { showToast('Máximo de 5 músicas por vez!'); return; }
+    queue.push({ key, song, band });
+    btn.textContent = '✓ Na fila';
+    btn.classList.add('added');
+    showToast('🎤 ' + song + ' adicionada!');
+  }
+  updateQueueBar();
+}
+
+function updateQueueBar() {
+  const bar = document.getElementById('queueBar');
+  const count = document.getElementById('queueCount');
+  const names = document.getElementById('queueNames');
+  if (queue.length > 0) {
+    bar.classList.add('visible');
+    count.textContent = queue.length + ' música(s) na fila';
+    names.textContent = queue.map(q => q.song).join(' · ');
+  } else {
+    bar.classList.remove('visible');
+  }
+}
+
+function clearQueue() {
+  queue = [];
+  updateQueueBar();
+  document.querySelectorAll('.add-btn.added, .add-btn-gold.added').forEach(btn => {
+    btn.textContent = '+ Pedir';
+    btn.classList.remove('added');
+  });
+  showToast('Lista limpa');
+}
+
+function openModal() {
+  const list = document.getElementById('modalList');
+  list.innerHTML = queue.map(q => `
+    <div class="modal-song">
+      <div class="modal-song-dot"></div>
+      <div><strong>${q.song}</strong> — ${q.band}</div>
+    </div>
+  `).join('');
+  document.getElementById('singerName').value = '';
+  document.getElementById('modalOverlay').classList.add('open');
+  setTimeout(() => document.getElementById('singerName').focus(), 200);
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+}
+
+function confirmQueue() {
+  const name = document.getElementById('singerName').value.trim();
+  if (!name) {
+    document.getElementById('singerName').focus();
+    document.getElementById('singerName').style.borderColor = 'var(--accent)';
+    showToast('Informe seu nome 😊');
+    return;
+  }
+  const songLines = queue.map((q, i) => `${i + 1}. ${q.song} — ${q.band}`).join('\n');
+  const msg = `🎤 *Pedido de Karaokê*\n\n👤 Nome: *${name}*\n\n🎵 Música(s):\n${songLines}\n\n_Enviado pelo catálogo do Rivo Trio_`;
+  const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+  closeModal();
+  clearQueue();
+  window.open(url, '_blank');
+}
+
+function renderMostRequested() {
+  const main = document.getElementById('mainContent');
+  let html = `<div class="most-requested">
+    <div class="most-requested-header">
+      <span class="star-icon">⭐</span>
+      <h2>As Mais Pedidas</h2>
+      <span>${mostRequested.length} músicas</span>
+    </div>
+    <div class="most-songs">`;
+  mostRequested.forEach((item, i) => {
+    const key = item.song + '||' + item.band;
+    const inQueue = queue.find(q => q.key === key);
+    html += `<div class="most-song-item">
+      <div class="rank">${i+1}</div>
+      <div class="most-song-info">
+        <div class="most-song-name">${item.song}</div>
+        <div class="most-song-band">${item.band}</div>
+      </div>
+      <button class="add-btn-gold ${inQueue ? 'added' : ''}" onclick="toggleSong('${item.song.replace(/'/g,"\\'")}','${item.band.replace(/'/g,"\\'")}',this)">
+        ${inQueue ? '✓ Na fila' : '+ Pedir'}
+      </button>
+    </div>`;
+  });
+  html += `</div></div>`;
+  main.innerHTML = html;
+}
+
+function renderStyle(styleKey) {
+  const style = data[styleKey];
+  const main = document.getElementById('mainContent');
+  let html = `<div class="section-title">${style.icon} ${style.label}</div>`;
+  style.bands.forEach(band => {
+    const bandId = 'band-' + band.name.replace(/[^a-z0-9]/gi,'').toLowerCase() + '-' + styleKey;
+    html += `<div class="band-card">
+      <div class="band-header" onclick="toggleBand('${bandId}')">
+        <div class="band-icon">${style.icon}</div>
+        <div class="band-name">${band.name}</div>
+        <div class="band-count">${band.songs.length} músicas</div>
+        <div class="chevron" id="chev-${bandId}">▼</div>
+      </div>
+      <div class="songs-list" id="${bandId}">`;
+    band.songs.forEach(song => {
+      const key = song + '||' + band.name;
+      const inQueue = queue.find(q => q.key === key);
+      html += `<div class="song-item">
+        <div class="song-name">${song}</div>
+        <button class="add-btn ${inQueue ? 'added' : ''}" onclick="toggleSong('${song.replace(/'/g,"\\'")}','${band.name.replace(/'/g,"\\'")}',this)">
+          ${inQueue ? '✓ Na fila' : '+ Pedir'}
+        </button>
+      </div>`;
+    });
+    html += `</div></div>`;
+  });
+
+  html += `<div class="admin-section" style="margin-top:30px;">
+    <div class="admin-header" onclick="toggleAdmin()">
+      <span class="admin-icon">⚙️</span>
+      <div class="admin-title">Área da banda — adicionar músicas</div>
+      <div class="chevron" id="adminChev" style="margin-left:auto">▼</div>
+    </div>
+    <div class="admin-body" id="adminBody">
+      <div class="password-gate" id="passwordGate">
+        <input type="password" id="adminPass" placeholder="Senha da banda" />
+        <button onclick="checkPass()">Entrar</button>
+      </div>
+      <div class="add-form" id="addForm">
+        <div class="form-row">
+          <select id="newStyle">
+            <option value="rock-br">Rock Nacional</option>
+            <option value="emo">Emo / Punk</option>
+            <option value="reggae">Reggae</option>
+            <option value="rock-int">Rock Internacional</option>
+            <option value="mpb">Pop, MPB & Festas</option>
+            <option value="funk">Funk & Pop</option>
+          </select>
+          <input type="text" id="newBand" placeholder="Nome da banda" />
+        </div>
+        <div class="form-row">
+          <input type="text" id="newSong" placeholder="Nome da música" style="grid-column: span 2" />
+        </div>
+        <button class="form-submit" onclick="addSong()">✓ Adicionar música</button>
+        <div class="admin-msg" id="adminMsg">Música adicionada com sucesso!</div>
+      </div>
+    </div>
+  </div>`;
+
+  main.innerHTML = html;
+}
+
+function toggleBand(id) {
+  const list = document.getElementById(id);
+  const chev = document.getElementById('chev-' + id);
+  list.classList.toggle('open');
+  chev.classList.toggle('open');
+}
+
+function toggleAdmin() {
+  const body = document.getElementById('adminBody');
+  const chev = document.getElementById('adminChev');
+  if (body) { body.classList.toggle('open'); chev.classList.toggle('open'); }
+}
+
+function checkPass() {
+  const val = document.getElementById('adminPass').value;
+  if (val === ADMIN_PASS) {
+    document.getElementById('passwordGate').style.display = 'none';
+    document.getElementById('addForm').classList.add('open');
+  } else {
+    showToast('Senha incorreta');
+  }
+}
+
+function addSong() {
+  const styleKey = document.getElementById('newStyle').value;
+  const bandName = document.getElementById('newBand').value.trim();
+  const songName = document.getElementById('newSong').value.trim();
+  if (!bandName || !songName) { showToast('Preencha banda e música'); return; }
+  const style = data[styleKey];
+  let band = style.bands.find(b => b.name.toLowerCase() === bandName.toLowerCase());
+  if (!band) { band = { name: bandName, songs: [] }; style.bands.push(band); }
+  if (!band.songs.includes(songName)) band.songs.push(songName);
+  document.getElementById('newBand').value = '';
+  document.getElementById('newSong').value = '';
+  const msg = document.getElementById('adminMsg');
+  msg.style.display = 'block';
+  setTimeout(() => msg.style.display = 'none', 2500);
+  if (currentStyle === styleKey) renderStyle(styleKey);
+}
+
+function setStyle(style) {
+  currentStyle = style;
+  document.querySelectorAll('.style-tab').forEach(t => t.classList.remove('active'));
+  document.querySelector('[data-style="' + style + '"]').classList.add('active');
+  if (style === 'mais-pedidas') renderMostRequested();
+  else renderStyle(style);
+}
+
+document.getElementById('styleTabs').addEventListener('click', e => {
+  const btn = e.target.closest('.style-tab');
+  if (btn) setStyle(btn.dataset.style);
+});
+
+renderMostRequested();
+</script>
+</body>
+</html>
